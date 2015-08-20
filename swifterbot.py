@@ -4,6 +4,11 @@ then automagically tweets. """
 
 
 from nltk.corpus import PlaintextCorpusReader
+from random import choice
+import sys
+import tweepy
+
+
 
 # SETTING UP THE DATA
 
@@ -46,26 +51,28 @@ unique_jonathan = sorted(set(jonathan) - (set(taylor) | set(manual)))
 # http://stackoverflow.com/questions/287871/print-in-terminal-with-colors-using-python
 class SourceColours:
     OTHER = '\x1b[37m'		# grey
-    ALL = '\x1b[33m'		# geel-groen
+    ALL = '\x1b[31m'		# geel-groen
     TAYLOR = '\x1b[35m' 	# magenta
     MANUAL = '\x1b[32m'		# groen
     JONATHAN = '\x1b[34m'	# paars-blauw
-    ENDC = '\x1b[38m'		# zwart
+    ENDC = '\x1b[0m'		# zwart
 
 
 def word_source(sent):
-	for word in sent.split():
+	for word in sent.split():		
 		if word in common_words:
-			return SourceColours.ALL + word + SourceColours.ENDC
+			print(SourceColours.ALL + word + SourceColours.ENDC),
 		elif word in unique_taylor:
-			return SourceColours.TAYLOR + word + SourceColours.ENDC
+			print(SourceColours.TAYLOR + word + SourceColours.ENDC),
 		elif word in unique_manual:
-			return SourceColours.MANUAL + word + SourceColours.ENDC
+			print(SourceColours.MANUAL + word + SourceColours.ENDC),
 		elif word in unique_jonathan:
-			return 	SourceColours.JONATHAN + word + SourceColours.ENDC
+			print(SourceColours.JONATHAN + word + SourceColours.ENDC),
 		else:
-			return 	SourceColours.OTHER + word + SourceColours.ENDC	
-
+			print(SourceColours.OTHER + word + SourceColours.ENDC),	
+	
+				
+				
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 # CONSTRUCTING THE SENTENCE GENERATOR
@@ -120,11 +127,31 @@ def sentence_builder(trigram_dict):
 	return ' '.join(new_sent[::-1])
 
 
+#  Setting up the twitter bot
+def pushTweet(sentence):
+	#enter the corresponding information from your Twitter application:
+	api_key, api_secret, access_token, token_secret = sys.argv[1:] # Automagically picks up the details form the command line. 
+	# api_key = raw_input("api_key > ")  
+	# api_secret = raw_input("api_secret > ")
+	# access_token = raw_input("Acces_token > ")
+	# token_secret = raw_input("Token_secret > ")
+	auth = tweepy.OAuthHandler(api_key, api_secret)
+	auth.set_access_token(access_token, token_secret)
+	api = tweepy.API(auth)
+	# this is how we'll connect our robot to Twitter through our application
+
+	api.update_status(status=sentence) 	# Generates the Tweet
+
+
+
+
+
 
 # BOIlERPLATE CODE
 if __name__ == "__main__":
 	trigram_dict = trigram_builder(words)
 	sent = sentence_builder(trigram_dict)
-
+	
 	print word_source(sent)
 
+	pushTweet(sent)
