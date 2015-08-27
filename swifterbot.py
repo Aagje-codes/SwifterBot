@@ -59,6 +59,7 @@ class SourceColours:
 
 
 def word_source(sent):
+	print "\n\n"
 	for word in sent.split():		
 		if word in common_words:
 			print(SourceColours.ALL + word + SourceColours.ENDC),
@@ -70,7 +71,7 @@ def word_source(sent):
 			print(SourceColours.JONATHAN + word + SourceColours.ENDC),
 		else:
 			print(SourceColours.OTHER + word + SourceColours.ENDC),	
-	
+	print "\n\n"
 				
 				
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -78,23 +79,26 @@ def word_source(sent):
 # CONSTRUCTING THE SENTENCE GENERATOR
 # BUILDING THE DICTIONARY
 def trigram_builder(words):
-	""" Builds a trigram from a list of words. The words should be in order of proper sentences in order for the 
-	sentence generator to work"""	
-	trigram_dict = {}
+    """ Builds a trigram from a list of words. The words should be in order of proper sentences in order for the 
+    sentence generator to work"""
+    trigram_dict = {}
+    
+    end_punct = ['.', '!', '?', '...', '....']
+    
+    for index in range(len(words)-2):
+        key = (words[index+2], words[index+1])
+        value = words[index]
+        if value in end_punct:
+            continue    		#In other words: don't add end-punctuations to the list of values
+        elif key in trigram_dict:
+            trigram_dict[key].append(value)
+        else:
+            trigram_dict[key] = []
+            trigram_dict[key].append(value)	
+            # creates a list that contains strings of value
+        
+    return trigram_dict	
 
-	for index in range(len(words)-2):
-		key = (words[index+2], words[index+1])
-		value = words[index]
-
-		if key in trigram_dict:
-			trigram_dict[key].append(value)
-		else:
-			trigram_dict[key] = []
-			trigram_dict[key].append(value)	
-			# creates a list that contains strings of values
-	
-	return trigram_dict
-	
 
 # GENERATING THE SENTENCE
 def sentence_builder(trigram_dict):
@@ -142,16 +146,19 @@ def pushTweet(sentence):
 
 	api.update_status(status=sentence) 	# Generates the Tweet
 
+def test(trigram_dictionary):
+	sent = sentence_builder(trigram_dictionary)
+	
+	print word_source(sent)
 
-
-
+	if len(sent) < 140:
+		pushTweet(sent)
+	else:
+		test(trigram_dict)
 
 
 # BOIlERPLATE CODE
 if __name__ == "__main__":
 	trigram_dict = trigram_builder(words)
-	sent = sentence_builder(trigram_dict)
-	
-	print word_source(sent)
 
-	pushTweet(sent)
+	test(trigram_dict)	
