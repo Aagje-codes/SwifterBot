@@ -13,7 +13,7 @@ import tweepy
 # SETTING UP THE DATA
 
 # BUILDING THE CORPUS
-location = '/Users/Aagje/Python01/Projects/Swifterbot/data'
+location = 'Swifterbot/data'
 swift_corpus = PlaintextCorpusReader(location, '.*.txt')
 
 # Adjusting for disparity between corpora
